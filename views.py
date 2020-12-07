@@ -11,4 +11,14 @@ def about_view(request):
 
 
 def contacts_view(request):
-    return '200 OK', render('contacts.html')
+    if request['method'] == 'POST':
+        data = request['data']
+        title = data['title']
+        email = data['email']
+        text = data['text']
+        with open(f'{email} - {title}.txt', 'w', encoding='utf-8') as f:
+            f.write(text)
+        return '200 OK', render('contacts.html')
+    else:
+        return '200 OK', render('contacts.html')
+
