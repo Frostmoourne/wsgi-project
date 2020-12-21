@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %} Список студентов {% endblock %}
+{% block body %}
+    <h1>Список студентов</h1>
+    {% for item in objects_list %}
+        <div class="card text-center">
+            <div class="card-header">
+                {{item.name}}
+            </div>
+            <div class="card-body">
+                {% for course in item.courses %}
+                    {{ course.name }}
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+
+{% endblock %}

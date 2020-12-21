@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %} Создание курса {% endblock %}
+{% block body %}
+<h1>Создание курса</h1>
+<form method="post">
+    <div class="mb-3">
+        <select class="form-select" name="course_name">
+            {% for item in courses %}
+            <option value="{{item.name}}">{{item.name}}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mb-3">
+        <select class="form-select" name="student_name">
+            {% for item in students %}
+            <option value="{{item.name}}">{{item.name}}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button class="btn btn-primary" type="submit">Записать</button>
+</form>
+{% endblock %}
