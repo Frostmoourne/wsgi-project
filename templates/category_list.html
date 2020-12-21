@@ -2,15 +2,20 @@
 {% block title %} Список курсов {% endblock %}
 {% block body %}
     <h1>Список категорий</h1>
-    {% for item in objects_list %}
-        <div class="card">
-            <div class="card-header">
-                {{item.name}}
+    <div class="row">
+        {% for item in objects_list %}
+            <div class="col-sm-6">
+                <div class="card">
+                    <div class="card-header">
+                        {{item.name}}
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Количество курсов: {{item.course_number()}}</h5>
+                        <a href="#" class="btn btn-primary">Перейти к категории курсов</a>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <h5 class="card-title">Количество курсов: {{item.course_number()}}</h5>
-                <a href="#" class="btn btn-primary">Перейти к категории курсов</a>
-            </div>
-        </div>
-    {% endfor %}
+        {% endfor %}
+    </div>
+
 {% endblock %}

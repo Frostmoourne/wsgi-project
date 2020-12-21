@@ -90,4 +90,4 @@ class MockApp(AppClass):
 
     def __call__(self, env, start_response):
         start_response('200 OK', [('Content-Type', 'text/html')])
-        return [b'Hello from Mock']
+        return [b'Hello from Fake']
