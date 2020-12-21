@@ -8,6 +8,13 @@
     <div class="mb-3">
         <input class="form-control" type="text" name="name" placeholder="Название">
     </div>
+    <div class="mb-3">
+        <select class="form-select form-select-lg mb-3">
+            {% for item in categories %}
+            <option value="{{item.id}}">{{item.name}}</option>
+            {% endfor %}
+        </select>
+    </div>
     <button class="btn btn-primary" type="submit">Сохранить</button>
 </form>
 {% endblock %}

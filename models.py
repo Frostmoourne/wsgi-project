@@ -73,3 +73,15 @@ class SiteInterface:
             if course.name == name:
                 return course
         return None
+
+
+class User:
+    pass
+
+
+class Teacher(User):
+    pass
+
+
+class Student(User):
+    pass
