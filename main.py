@@ -1,14 +1,18 @@
 from wsgi_framework.core import AppClass, DebugApp, MockApp
 from wsgi_framework.frameworkcbv import CreateView, ListView
 from wsgi_framework.templates import render
+
 from models import SiteInterface, EmailNotifier, SmsNotifier, Serializer
 from logger import Logger, debug
+from mappers import MapperRegistry
+from orm.unitofwork import UnitOfWork
 
 site = SiteInterface()
 logger = Logger('Main')
 email_notifier = EmailNotifier()
 sms_notifier = SmsNotifier()
-
+UnitOfWork.new_current()
+UnitOfWork.get_current().set_mapper_registry(MapperRegistry)
 
 def main_view(request):
     logger.log("Список курсов")
@@ -89,9 +93,11 @@ class CategoryListView(ListView):
 
 
 class StudentsListView(ListView):
-    queryset = site.students
     template_name = 'students_list.html'
 
+    def get_queryset(self):
+        mapper = MapperRegistry.get_current_mapper('student')
+        return mapper.all()
 
 class StudentCreateView(CreateView):
     template_name = 'create_student.html'
@@ -100,6 +106,8 @@ class StudentCreateView(CreateView):
         name = data['name']
         new_obj = site.create_user('student', name)
         site.students.append(new_obj)
+        new_obj.mark_new()
+        UnitOfWork.get_current().commit()
 
 
 class AddStudentByCourseCreateView(CreateView):
