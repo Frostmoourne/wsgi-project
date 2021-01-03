@@ -2,7 +2,7 @@ from wsgi_framework.core import AppClass, DebugApp, MockApp
 from wsgi_framework.frameworkcbv import CreateView, ListView
 from wsgi_framework.templates import render
 
-from models import SiteInterface, EmailNotifier, SmsNotifier, Serializer
+from models import SiteInterface, EmailNotifier, SmsNotifier, Serializer, Student
 from logger import Logger, debug
 from mappers import MapperRegistry
 from orm.unitofwork import UnitOfWork
@@ -96,7 +96,7 @@ class StudentsListView(ListView):
     template_name = 'students_list.html'
 
     def get_queryset(self):
-        mapper = MapperRegistry.get_current_mapper('student')
+        mapper = MapperRegistry.get_current_mapper('student', Student)
         return mapper.all()
 
 class StudentCreateView(CreateView):

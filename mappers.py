@@ -25,19 +25,20 @@ class DbDeleteException(Exception):
         super().__init__(f'Db delete error: {message}')
 
 
-class StudentMapper:
+class Mapper:
 
-    def __init__(self, connection):
+    def __init__(self, connection, tablename, mapper):
         self.connection = connection
         self.cursor = connection.cursor()
-        self.tablename = 'student'
+        self.tablename = tablename
+        self.mapper = mapper
 
     def find_by_id(self, id):
         statement = f"SELECT id, name FROM {self.tablename} WHERE id=?"
         self.cursor.execute(statement, (id,))
         result = self.cursor.fetchone()
         if result:
-            return Student(*result)
+            return self.mapper(*result)
         else:
             raise RecordNotFoundException(f'Запись с id={id} не найдена.')
 
@@ -47,9 +48,9 @@ class StudentMapper:
         result = []
         for item in self.cursor.fetchall():
             id, name = item
-            student = Student(name)
-            student.id = id
-            result.append(student)
+            item = self.mapper(name)
+            item.id = id
+            result.append(item)
         return result
 
     def insert(self, obj):
@@ -59,161 +60,6 @@ class StudentMapper:
             self.connection.commit()
         except Exception as e:
             raise DbCommitException(e.args)
-
-    def update(self, obj):
-        statement = f"UPDATE {self.tablename} SET name=? WHERE id=?"
-        self.cursor.execute(statement, (obj.name, obj.id))
-        try:
-            self.connection.commit()
-        except Exception as e:
-            raise DbUpdateException(e.args)
-
-    def delete(self, obj):
-        statement = f"DELETE FROM {self.tablename} WHERE id=?"
-        self.cursor.execute(statement, (obj.id,))
-        try:
-            self.connection.commit()
-        except Exception as e:
-            raise DbDeleteException(e.args)
-
-
-class TeacherMapper:
-
-    def __init__(self, connection):
-        self.connection = connection
-        self.cursor = connection.cursor()
-        self.tablename = 'teacher'
-
-    def find_by_id(self, id):
-        statement = f"SELECT id, name FROM {self.tablename} WHERE id=?"
-        self.cursor.execute(statement, (id,))
-        result = self.cursor.fetchone()
-        if result:
-            return Teacher(*result)
-        else:
-            raise RecordNotFoundException(f'Запись с id={id} не найдена.')
-
-    def all(self):
-        statement = f'SELECT * from {self.tablename}'
-        self.cursor.execute(statement)
-        result = []
-        for item in self.cursor.fetchall():
-            id, name = item
-            teacher = Teacher(name)
-            teacher.id = id
-            result.append(teacher)
-        return result
-
-    def insert(self, obj):
-        statement = f"INSERT INTO {self.tablename} (name) VALUES (?)"
-        self.cursor.execute(statement, (obj.name,))
-        try:
-            self.connection.commit()
-        except Exception as e:
-            raise DbCommitException(e.args)
-
-    def update(self, obj):
-        statement = f"UPDATE {self.tablename} SET name=? WHERE id=?"
-        self.cursor.execute(statement, (obj.name, obj.id))
-        try:
-            self.connection.commit()
-        except Exception as e:
-            raise DbUpdateException(e.args)
-
-    def delete(self, obj):
-        statement = f"DELETE FROM {self.tablename} WHERE id=?"
-        self.cursor.execute(statement, (obj.id,))
-        try:
-            self.connection.commit()
-        except Exception as e:
-            raise DbDeleteException(e.args)
-
-
-class CourseMapper:
-
-    def __init__(self, connection):
-        self.connection = connection
-        self.cursor = connection.cursor()
-        self.tablename = 'course'
-
-    def find_by_id(self, id):
-        statement = f"SELECT id, name, category FROM {self.tablename} WHERE id=?"
-        self.cursor.execute(statement, (id,))
-        result = self.cursor.fetchone()
-        if result:
-            return Course(*result)
-        else:
-            raise RecordNotFoundException(f'Запись с id={id} не найдена.')
-
-    def insert(self, obj):
-        statement = f"INSERT INTO {self.tablename} (name) VALUES (?)"
-        self.cursor.execute(statement, (obj.name,))
-        try:
-            self.connection.commit()
-        except Exception as e:
-            raise DbCommitException(e.args)
-
-    def all(self):
-        statement = f'SELECT * from {self.tablename}'
-        self.cursor.execute(statement)
-        result = []
-        for item in self.cursor.fetchall():
-            id, name = item
-            course = Course(name)
-            course.id = id
-            result.append(course)
-        return result
-
-    def update(self, obj):
-        statement = f"UPDATE {self.tablename} SET name=? WHERE id=?"
-        self.cursor.execute(statement, (obj.name, obj.id))
-        try:
-            self.connection.commit()
-        except Exception as e:
-            raise DbUpdateException(e.args)
-
-    def delete(self, obj):
-        statement = f"DELETE FROM {self.tablename} WHERE id=?"
-        self.cursor.execute(statement, (obj.id,))
-        try:
-            self.connection.commit()
-        except Exception as e:
-            raise DbDeleteException(e.args)
-
-
-class CategoryMapper:
-    def __init__(self, connection):
-        self.connection = connection
-        self.cursor = connection.cursor()
-        self.tablename = 'category'
-
-    def find_by_id(self, id):
-        statement = f"SELECT id, name FROM {self.tablename} WHERE id=?"
-        self.cursor.execute(statement, (id,))
-        result = self.cursor.fetchone()
-        if result:
-            return Course(*result)
-        else:
-            raise RecordNotFoundException(f'Запись с id={id} не найдена.')
-
-    def insert(self, obj):
-        statement = f"INSERT INTO {self.tablename} (name) VALUES (?)"
-        self.cursor.execute(statement, (obj.name,))
-        try:
-            self.connection.commit()
-        except Exception as e:
-            raise DbCommitException(e.args)
-
-    def all(self):
-        statement = f'SELECT * from {self.tablename}'
-        self.cursor.execute(statement)
-        result = []
-        for item in self.cursor.fetchall():
-            id, name = item
-            category = Category(name)
-            category.id = id
-            result.append(category)
-        return result
 
     def update(self, obj):
         statement = f"UPDATE {self.tablename} SET name=? WHERE id=?"
@@ -233,24 +79,18 @@ class CategoryMapper:
 
 
 class MapperRegistry:
-    mappers = {
-        'student': StudentMapper,
-        'teacher': TeacherMapper,
-        'course': CourseMapper,
-        'category': CategoryMapper,
-    }
 
     @staticmethod
     def get_mapper(obj):
         if isinstance(obj, Student):
-            return StudentMapper(connection)
+            return Mapper(connection, 'student', Student)
         if isinstance(obj, Teacher):
-            return TeacherMapper(connection)
+            return Mapper(connection, 'teacher', Teacher)
         if isinstance(obj, Course):
-            return CourseMapper(connection)
+            return Mapper(connection, 'course', Course)
         if isinstance(obj, Category):
-            return CategoryMapper(connection)
+            return Mapper(connection, 'category', Category)
 
     @staticmethod
-    def get_current_mapper(name):
-        return MapperRegistry.mappers[name](connection)
+    def get_current_mapper(name, mapper):
+        return Mapper(connection, name, mapper)
